@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#7e9183">
+  <meta name="description" content="당신의 도시, 오늘의 날씨. 계절과 바람, 비와 눈을 한 그루의 나무로 만나보세요.">
+  <meta name="weather-data-source" content="Open-Meteo, GeoNames; CC BY 4.0">
+  <title>날씨나무</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Manrope:wght@400;500;600;700;800&family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css?v=asset-1">
+  <link rel="modulepreload" href="vendor/three.module.min.js">
+  <link rel="modulepreload" href="vendor/GLTFLoader.js">
+  <script src="solar.js?v=mood-3" defer></script>
+  <script src="atmosphere.js?v=mood-3" defer></script>
+  <script src="tree-fallback.js" defer></script>
+  <script src="tree.js?v=asset-3" defer></script>
+  <script src="app.js?v=orbit-1" defer></script>
+</head>
+<body>
+  <svg aria-hidden="true" class="svg-library" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <symbol id="i-leaf" viewBox="0 0 24 24"><path d="M20 4c-9-1-15 3-15 8a6 6 0 0 0 6 6c5 0 8-6 9-14Z"/><path d="M4 21 15 10M8 16v-5m0 5h5"/></symbol>
+      <symbol id="i-search" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 4.5 4.5"/></symbol>
+      <symbol id="i-location" viewBox="0 0 24 24"><circle cx="12" cy="12" r="6.5"/><circle cx="12" cy="12" r="2"/><path d="M12 2v3m0 14v3M2 12h3m14 0h3"/></symbol>
+      <symbol id="i-pin" viewBox="0 0 24 24"><path d="M19 10c0 5-7 11-7 11S5 15 5 10a7 7 0 0 1 14 0Z"/><circle cx="12" cy="10" r="2.3"/></symbol>
+      <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M4 12h15m-6-6 6 6-6 6"/></symbol>
+      <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"/></symbol>
+      <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20.8 14.3A9 9 0 0 1 9.7 3.2a9 9 0 1 0 11.1 11.1Z"/><path d="M17.5 3.5v4m-2-2h4"/></symbol>
+      <symbol id="i-cloud" viewBox="0 0 24 24"><path d="M6.5 18a4.5 4.5 0 1 1 .3-9 6 6 0 0 1 11.6 1.7A3.7 3.7 0 1 1 18 18Z"/></symbol>
+      <symbol id="i-rain" viewBox="0 0 24 24"><path d="M6 14a4 4 0 1 1 .8-7.9A5.5 5.5 0 0 1 17 8a3 3 0 1 1 1 6M7 18l-1 3m6-3-1 3m6-3-1 3"/></symbol>
+      <symbol id="i-snow" viewBox="0 0 24 24"><path d="M12 2v20M3.3 7l17.4 10M3.3 17 20.7 7M9 4l3 3 3-3M9 20l3-3 3 3M4 10l4-1-1-4m13 9-4 1 1 4M7 19l1-4-4-1m13-9-1 4 4 1"/></symbol>
+      <symbol id="i-wind" viewBox="0 0 24 24"><path d="M3 8h12a3 3 0 1 0-3-3M3 12h16a3 3 0 1 1-3 3M3 16h7a2.5 2.5 0 1 1-2.5 2.5"/></symbol>
+      <symbol id="i-drop" viewBox="0 0 24 24"><path d="M12 3S5 10.2 5 15a7 7 0 0 0 14 0c0-4.8-7-12-7-12Z"/><path d="M8.5 15.5a3.5 3.5 0 0 0 3.5 3"/></symbol>
+      <symbol id="i-thermo" viewBox="0 0 24 24"><path d="M9 14V5a3 3 0 0 1 6 0v9a5 5 0 1 1-6 0Z"/><path d="M12 8v10"/></symbol>
+      <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></symbol>
+      <symbol id="i-close" viewBox="0 0 24 24"><path d="m6 6 12 12M6 18 18 6"/></symbol>
+      <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v6m0-10v.1"/></symbol>
+      <symbol id="i-flower" viewBox="0 0 24 24"><path d="M12 8c-5-9-11 0-5 3-9 2-4 11 2 6 0 9 10 7 8 0 8 4 11-6 3-7 6-6-4-12-8-2Z"/><circle cx="12" cy="12" r="2"/></symbol>
+      <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M20 8a8 8 0 1 0 0 8M20 3v5h-5"/></symbol>
+    </defs>
+  </svg>
+  <div class="site-shell">
+    <header class="site-header">
+      <form class="search-form" id="searchForm" autocomplete="off">
+        <svg class="search-icon" aria-hidden="true"><use href="#i-search"/></svg>
+        <label class="sr-only" for="citySearch">도시 이름 검색</label>
+        <input id="citySearch" placeholder="도시 검색" role="combobox" aria-expanded="false" aria-controls="searchResults" aria-autocomplete="list" maxlength="80">
+        <button class="search-submit" type="submit" aria-label="지역 검색"><svg><use href="#i-arrow"/></svg></button>
+        <div class="search-results" id="searchResults" role="listbox" hidden></div>
+      </form>
+      <button class="location-button" id="locateButton" aria-label="내 위치의 날씨 보기" title="내 위치의 날씨 보기"><svg><use href="#i-location"/></svg><span>내 위치</span></button>
+    </header>
+    <main>
+      <div class="notice" id="notice" role="status" hidden></div>
+      <section class="weather-layout" aria-label="오늘의 날씨와 나무">
+        <aside class="weather-panel" aria-live="polite" aria-busy="true" id="weatherPanel">
+          <div class="weather-top">
+            <div class="city-heading"><h1 id="cityName">서울</h1><p id="cityDetail" class="city-detail">대한민국</p></div>
+          </div>
+          <div class="weather-meta"><p class="full-date" id="fullDate">—</p><div class="panel-actions"><span id="cityTime">—</span><button id="refreshButton" aria-label="날씨 새로고침" title="날씨 새로고침"><svg><use href="#i-refresh"/></svg></button></div></div>
+          <div class="temperature-row"><span class="temperature" id="temperature">—<span>°</span></span><svg class="weather-emblem" id="mainWeatherIcon" aria-hidden="true"><use href="#i-cloud"/></svg></div>
+          <div class="condition-row"><span id="weatherLabel">날씨를 불러오는 중</span><span class="temp-range"><span class="high" id="tempMax">—°</span><span class="range-slash">/</span><span id="tempMin">—°</span></span></div>
+          <div class="weather-metrics">
+            <div class="metric"><span><svg aria-hidden="true"><use href="#i-thermo"/></svg>체감 온도</span><strong id="feelsLike">—°</strong></div>
+            <div class="metric"><span><svg aria-hidden="true"><use href="#i-drop"/></svg>습도</span><strong id="humidity">—<small>%</small></strong></div>
+            <div class="metric"><span><svg aria-hidden="true"><use href="#i-wind"/></svg>바람</span><strong id="wind">—<small>m/s</small></strong></div>
+            <div class="metric"><span><svg aria-hidden="true"><use href="#i-rain"/></svg>강수 확률</span><strong id="rainChance">—<small>%</small></strong></div>
+          </div>
+        </aside>
+        <div class="landscape" id="landscape" data-season="autumn">
+          <canvas id="treeCanvas" aria-label="현재 날씨와 계절에 따라 변하는 3D 나무. 좌우로 드래그하거나 방향키로 회전할 수 있습니다." role="img" tabindex="0"></canvas>
+          <details class="asset-credit">
+            <summary aria-label="나무 에셋 출처" title="나무 에셋 출처"><svg aria-hidden="true"><use href="#i-info"/></svg></summary>
+            <div class="asset-credit-popup"><p><a href="https://sketchfab.com/3d-models/realistic-tree-d989c0f801d847b9a74992ec4ddcfdfc" target="_blank" rel="noopener noreferrer">Realistic Tree</a> · <a href="https://sketchfab.com/danielpetrov" target="_blank" rel="noopener noreferrer">Daniel</a></p><p><a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer">CC BY 4.0</a> · 웹용 텍스처 최적화 및 계절·바람 표현 적용</p></div>
+          </details>
+          <button class="preview-trigger" id="previewButton" aria-label="날씨 미리보기" title="날씨 미리보기" aria-expanded="false" aria-controls="previewMenu"><svg><use href="#i-sun"/></svg></button>
+          <div class="preview-menu" id="previewMenu" hidden>
+            <div class="preview-options" role="group" aria-label="날씨 풍경 미리보기">
+              <button data-weather="clear"><svg><use href="#i-sun"/></svg>맑음</button><button data-weather="rain"><svg><use href="#i-rain"/></svg>비</button><button data-weather="snow"><svg><use href="#i-snow"/></svg>눈</button><button data-weather="wind"><svg><use href="#i-wind"/></svg>바람</button>
+            </div>
+            <button class="return-live" id="returnLive"><svg><use href="#i-refresh"/></svg>실제 날씨로 돌아가기</button>
+          </div>
+          <button class="preview-badge" id="previewBadge" aria-label="실제 날씨로 돌아가기" title="실제 날씨로 돌아가기" hidden><svg><use href="#i-refresh"/></svg></button>
+        </div>
+      </section>
+    </main>
+  </div>
+</body>
+</html>
