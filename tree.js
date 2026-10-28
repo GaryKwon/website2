@@ -62,6 +62,11 @@
       const T=await import('./vendor/three.module.min.js');
       if(this.disposed)return;
       this.T=T;
+      const [{WeatherClouds},{GroundWeather}]=await Promise.all([
+        import('./weather-clouds.js?v=weather-1'),import('./ground-weather.js?v=weather-1')
+      ]);
+      if(this.disposed)return;
+      this.WeatherClouds=WeatherClouds;this.GroundWeather=GroundWeather;
       this.renderer=new T.WebGLRenderer({canvas:this.canvas,alpha:true,antialias:true,powerPreference:'low-power'});
       this.renderer.setClearColor(0x000000,0);
       this.renderer.outputColorSpace=T.SRGBColorSpace;
@@ -101,6 +106,7 @@
       this.sculpture.add(this.tree);
       this.makeLights();
       this.makePlatform();
+      this.groundWeather=new this.GroundWeather(this);
       this.makeSky();
       this.makePrecipitation();
       this.bindEvents();
@@ -242,7 +248,6 @@
         await this.model.load();
         if(this.disposed)return;
         this.tree.add(this.model.root);
-        this.makeModelSnowCap();
       } catch(error) {
         if(this.disposed)return;
         this.model?.dispose();this.model=null;
@@ -262,12 +267,6 @@
         node.dataset.modelState=state.assetStage;
         if(this.assetError)node.dataset.assetError=this.assetError;
       }
-    }
-    makeModelSnowCap() {
-      const T=this.T;
-      this.snowMaterial=this.ownMaterial(new T.MeshStandardMaterial({color:'#e4ece7',roughness:.95,transparent:true,opacity:.86}));
-      this.snowCap=this.mesh(this.ownGeometry(new T.CylinderGeometry(1.57,1.59,.012,64)),this.snowMaterial,this.platform);
-      this.snowCap.position.y=.071;this.snowCap.visible=false;
     }
     makeProceduralTree() {
       const T=this.T,r=seeded(204910),parts=[];
@@ -360,9 +359,6 @@
       this.accents=[[-.85,.069,.55],[.58,.069,-.75]].map((p,i)=>{
         const m=this.mesh(leafGeometry,this.accentMaterial,this.platform);m.position.set(...p);m.rotation.set(-Math.PI/2,0,i*.8+.3);return m;
       });
-      this.snowMaterial=this.ownMaterial(new T.MeshStandardMaterial({color:'#e4ece7',roughness:.95,transparent:true,opacity:.86}));
-      this.snowCap=this.mesh(this.ownGeometry(new T.CylinderGeometry(1.57,1.59,.012,64)),this.snowMaterial,this.platform);
-      this.snowCap.position.y=.071;this.snowCap.visible=false;
     }
     makeSky() {
       const T=this.T;
@@ -382,17 +378,7 @@
       });
       this.moonMaterial=this.ownMaterial(new T.SpriteMaterial({map:this.moonTexture,transparent:true,depthTest:false,depthWrite:false,toneMapped:false}));
       this.moon=new T.Sprite(this.moonMaterial);this.moon.scale.set(.48,.48,1);this.moon.renderOrder=30;this.scene.add(this.moon);
-      this.cloudMaterial=this.ownMaterial(new T.MeshStandardMaterial({color:'#e6ece7',roughness:1,transparent:true,opacity:.86,depthTest:false,depthWrite:false}));
-      const cloudGeometry=this.ownGeometry(new T.SphereGeometry(1,16,12));
-      const puffs=[[-.43,-.025,.01,.20],[-.25,.075,-.025,.25],[-.03,.16,-.035,.31],[.22,.09,.025,.27],[.45,-.025,.01,.19],[-.27,-.095,.055,.23],[-.025,-.08,.11,.29],[.24,-.085,.10,.25],[.04,.04,.18,.24]];
-      this.clouds=[];
-      for(let i=0;i<3;i++) {
-        const group=new T.Group();
-        puffs.forEach(([x,y,z,r])=>{
-          const puff=this.mesh(cloudGeometry,this.cloudMaterial,group);puff.position.set(x,y,z);puff.scale.set(r,r*.83,r*.77);puff.renderOrder=32;
-        });
-        this.scene.add(group);this.clouds.push(group);
-      }
+      this.weatherClouds=new this.WeatherClouds(this);
     }
     makePrecipitation() {
       const T=this.T,r=seeded(9871);
@@ -489,7 +475,7 @@
       });
       this.blossoms.forEach(mesh=>mesh.visible=season==='spring');
       this.accents.forEach(mesh=>mesh.visible=season==='autumn');
-      this.snowCap.visible=SNOW.has(this.weather.code)&&season==='winter';
+      this.groundWeather?.updateWeather(this.weather);
       this.rainParticles.visible=RAIN.has(this.weather.code);
       this.flakes.visible=SNOW.has(this.weather.code);
       if(!this.hasWeather){this.night=this.nightTarget();this.hasWeather=true;}
@@ -588,22 +574,7 @@
       this.moon.visible=Boolean(moon.visible);
       if(sun.visible){this.skyPosition(sun,this.sunPosition);this.sun.position.copy(this.sunPosition);this.sunGlow.position.copy(this.sunPosition);this.sunMaterial.opacity=sun.opacity*(.98-cover*.14);this.glowMaterial.opacity=sun.opacity*(.88-cover*.25);}
       if(moon.visible){this.skyPosition(moon,this.moonPosition);this.moon.position.copy(this.moonPosition);this.moonMaterial.opacity=moon.opacity??1;}
-      this.cloudMaterial.color.lerpColors(this.colors.skyDay,this.colors.skyNight,this.night);
-      this.cloudMaterial.opacity=.86-this.night*.13;
-      for(let i=0;i<this.clouds.length;i++) {
-        const cloud=this.clouds[i];cloud.visible=cloudy;
-        if(!cloudy)continue;
-        if(i===2) {
-          const orb=sun.visible?this.sunPosition:moon.visible?this.moonPosition:null;
-          cloud.visible=Boolean(orb);
-          if(orb)cloud.position.copy(orb).addScaledVector(this.cameraRight,.38+Math.sin(time*.10)*.035).addScaledVector(this.cameraUp,-.21).addScaledVector(this.cameraForward,-.15);
-          cloud.scale.setScalar(.62);
-        } else {
-          const x=(i===0?-.58:.58)*this.camera.right+Math.sin(time*.06+i)*.07;
-          cloud.position.copy(this.target).addScaledVector(this.cameraRight,x).addScaledVector(this.cameraUp,this.camera.top*(i===0?.53:.61)).addScaledVector(this.cameraForward,2.9);
-          cloud.scale.setScalar(i===0?1.05:.87);
-        }
-      }
+      this.weatherClouds?.update(time,sun,moon);
       if(this.parent)this.parent.dataset.daylight=String(Boolean(sun.isDay));
     }
     updateLighting() {
@@ -664,7 +635,7 @@
       if(this.disposed||!this.ready||document.hidden)return;
       const interval=this.motion.matches?250:33;
       if(now-this.lastPaint>=interval) {
-        const dt=Math.min(.10,(now-(this.lastPaint||now-33))/1000);
+        const dt=Math.min(this.motion.matches?.30:.10,(now-(this.lastPaint||now-33))/1000);
         this.lastPaint=now;
         const reduced=this.motion.matches,time=reduced?0:now/1000;
         this.hover+=(this.hoverTarget-this.hover)*Math.min(1,dt*7);
@@ -682,6 +653,9 @@
         });
         this.updateLighting();this.updateSky(time);this.updateParticles(time,wind);
         this.model?.update(time,wind,this.night,reduced);
+        this.groundWeather?.update(time,dt);
+        this.canvas.dataset.cloudAsset=this.weatherClouds?.loaded?'loaded':'loading';
+        this.canvas.dataset.groundAssets=this.groundWeather?.assetsLoaded?'loaded':'loading';
         const renderStart=performance.now();
         this.renderer.render(this.scene,this.camera);
         this.renderCpuMsLast=performance.now()-renderStart;
@@ -709,6 +683,9 @@
         dragActive:this.dragActive,dragPointerId:this.dragPointerId,rotationYaw:this.rotationYaw,rotationTarget:this.rotationTarget,
         renderCpuMsLast:this.renderCpuMsLast,renderCpuMsAverage:this.renderCpuMsAverage,
         ...this.assetState,
+        cloudAssetLoaded:this.weatherClouds?.loaded===true,
+        cloudAsset:this.weatherClouds?.getDiagnostics(),
+        groundWeather:this.groundWeather?.getDiagnostics(),
         limits:{desktopDpr:1.4,mobileDpr:1.25,shadow:1024,maxFps:30,reducedMotionFps:4},
         renderer:this.fallback?'fallback':this.ready?'webgl':'loading'
       };
@@ -719,6 +696,9 @@
       this.unbindEvents();
       if(this.assetState.assetStatus==='loading')Object.assign(this.assetState,{assetStatus:'aborted',assetStage:'aborted',assetLoaded:false});
       this.model?.dispose();this.model=null;this.syncModelStatus();
+      this.weatherClouds?.dispose();this.weatherClouds=null;
+      this.groundWeather?.dispose();this.groundWeather=null;
+      this.WeatherClouds=this.GroundWeather=null;
       clearTimeout(this.touchTimer);this.touchTimer=null;
       if(this.scene)this.scene.traverse(object=>{if(object.isInstancedMesh)object.dispose?.();});
       for(const light of this.lights)light.shadow?.dispose?.();

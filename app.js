@@ -237,7 +237,7 @@
     const light=sun.visible?sun:moon;
     body.style.setProperty('--sky-light-x',`${Math.round((light.x-150)/500*80+10)}%`);
     body.dataset.period=theme.period;body.dataset.weather=theme.weatherKind;
-    scene.setWeather({season:state.season,...conditions,isDay:solar.isDay,solar,nightAmount:theme.nightAmount});
+    scene.setWeather({locationKey:`${state.city.latitude},${state.city.longitude}`,season:state.season,...conditions,isDay:solar.isDay,solar,nightAmount:theme.nightAmount});
     $('landscape').dataset.season=state.season;
     $('previewBadge').hidden=!state.preview;
     $('previewBadge').setAttribute('aria-label','실제 날씨로 돌아가기');
