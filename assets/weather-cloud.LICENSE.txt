@@ -1,0 +1,10 @@
+Weather cloud sprite
+====================
+
+File: weather-cloud.png
+Created for this website with OpenAI's built-in image generation tool on 2026-10-28.
+This is an AI-generated visual asset; no third-party cloud photograph or stock asset was used.
+The original transparent PNG was resized to 1024 x 512 pixels with its alpha channel preserved.
+
+Generation prompt:
+Use case: photorealistic-natural. Asset type: isolated transparent cloud sprite for a real-time 3D weather diorama. Primary request: a single softly billowing realistic white cumulus cloud isolated with genuine transparent alpha, no sky or ground. Composition: wide cloud, roughly 2:1 width to height, centered fully visible with generous transparent margin on every edge. Natural irregular silhouette with multiple soft lobes, wispy semitransparent feathered edges, believable fine vapor texture and dimensional depth. Lighting: warm-white diffuse sunlight from upper left, soft cool blue-gray internal shadows toward underside, airy and luminous. A natural meteorological cumulus cloud, not cotton wool, not cartoon, no hard spherical seams. No sun, horizon, text, watermark, floor, drop shadow, frame or other objects. High-quality realistic texture meant to blend softly with an atmospheric scene. Prefer compact 1024 pixel wide output.
