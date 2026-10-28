@@ -1,0 +1,11 @@
+Realistic Tree
+Creator: Daniel (danielpetrov)
+Model: https://sketchfab.com/3d-models/realistic-tree-d989c0f801d847b9a74992ec4ddcfdfc
+Creator: https://sketchfab.com/danielpetrov
+License: Creative Commons Attribution 4.0 International (CC BY 4.0)
+License URL: https://creativecommons.org/licenses/by/4.0/
+
+The original model was downloaded using Sketchfab's official download UI.
+Web adaptation: material conversion to metallic-roughness PBR, removal of unused specular maps,
+bark base-color encoding optimization, normal/occlusion texture resolution optimization,
+seasonal foliage color/density and wind animation. Original mesh geometry was retained.
